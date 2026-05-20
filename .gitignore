@@ -43,3 +43,7 @@ mlruns/
 # Environment
 .env
 .env.local
+
+# Project docs (not part of codebase)
+algorithm_writeup.md
+system_design.md
