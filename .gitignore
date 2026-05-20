@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (large files)
+data/*.csv
+data/*.parquet
+data/*.xlsx
+
+# MLflow
+mlruns/
+.mlflow/
+
+# ZenML
+.zen/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment
+.env
+.env.local
