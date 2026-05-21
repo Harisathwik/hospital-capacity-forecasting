@@ -228,7 +228,28 @@ Prediction risk guardrails:
 - We add auto-retraining only after we see consistent drift or sustained metric degradation.
 
 ## Versioning & Governance (TODO)
-TBD: registry stages (staging/production), promotion gates, rollback strategy.
+LOCKED: **Two-stage promotion flow** (Staging > Production)
+
+### Model registry stages
+- **Staging**: candidate models that passed training/eval and are ready for review
+- **Production**: the currently-serving batch model version
+
+### What gets versioned (the 4 sources of truth)
+- **Code**: git commit SHA
+- **Data**: pull manifest (dataset_id, query, date range, row count)
+- **Model**: registered model version + artifacts (full preprocessing+model pipeline)
+- **Config**: configs/config.yaml (and any per-env overrides)
+
+### Promotion gates (must pass to move Staging > Production)
+- Beats naive baseline on the **primary metric** (asymmetric RMSE under 13)
+- Passes guardrail: underprediction rate below an agreed threshold (set later)
+- Data validation passed (schema/type/range/missingness)
+- Training run is reproducible (same inputs re-run yields similar metrics within tolerance)
+
+### Rollback
+- Production points to a single model version.
+- Rollback = re-point batch inference to the previous Production model version.
+- Rollback target time: <5 minutes.
 
 ## ZenML Stack Specification (TODO)
 TBD in Phase 2H after requirements are set.

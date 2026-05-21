@@ -99,3 +99,16 @@ retraining:
   trigger: drift
   schedule: weekly
   min_samples: 30
+
+governance:
+  registry_stages:
+    staging: Staging
+    production: Production
+  promotion_gates:
+    require_beats_naive_baseline: true
+    require_data_validation_pass: true
+    require_reproducible_run: true
+    require_underprediction_rate_below_threshold: true
+  thresholds:
+    # Set during implementation once we have baseline numbers
+    max_underprediction_rate: null
