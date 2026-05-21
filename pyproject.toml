@@ -4,25 +4,42 @@ version = "0.1.0"
 description = "Hospital Bed Demand Forecasting — Predict ICU bed demand for proactive staffing"
 requires-python = ">=3.10"
 dependencies = [
-    "zenml>=0.60.0",
-    "mlflow>=2.14.0",
-    "evidently>=0.4.0",
-    "scikit-learn>=1.5.0",
-    "xgboost>=2.0.0",
-    "pandas>=2.2.0",
-    "numpy>=1.26.0",
-    "pyyaml>=6.0.0",
-    "python-dotenv>=1.0.0",
-    "fastapi>=0.115.0",
-    "uvicorn>=0.30.0",
-    "streamlit>=1.38.0",
-    "requests>=2.32.0",
-    "matplotlib>=3.9.0",
-    "seaborn>=0.13.0",
-    "pytest>=8.0.0",
-    "pytest-asyncio>=0.23.0",
-    "ruff>=0.6.0",
-    "mypy>=1.11.0",
+    # Pinned to known-working local environment (Windows) to keep ZenML stable/reproducible.
+    # If you want looser constraints later, we can relax these once CI is green.
+    "zenml==0.94.4",
+    "mlflow==3.12.0",
+    "evidently==0.7.21",
+
+    # ML
+    "scikit-learn==1.8.0",
+    "xgboost==3.2.0",
+    "pandas==2.3.3",
+    "numpy==2.4.6",
+
+    # App/config
+    "pyyaml==6.0.3",
+    "python-dotenv==1.2.2",
+    "requests==2.34.2",
+
+    # Batch/API/dashboard (kept pinned; we can trim later if not used in MVP)
+    "fastapi==0.136.1",
+    "uvicorn==0.47.0",
+    "streamlit==1.57.0",
+    "matplotlib==3.10.9",
+
+    # Test/dev (install later if/when we start writing tests + CI enforcement)
+    "pytest==9.0.3",
+
+    # ZenML store/runtime deps that were required on Windows
+    "sqlmodel==0.0.19",
+    "pymysql==1.2.0",
+    "passlib==1.7.4",
+    "sqlalchemy-utils==0.42.1",
+
+    # OpenTelemetry versions that unblocked `zenml status` in this environment
+    "opentelemetry-api==1.42.1",
+    "opentelemetry-sdk==1.41.1",
+    "opentelemetry-semantic-conventions==0.62b1",
 ]
 
 [tool.ruff]
