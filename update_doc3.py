@@ -1,5 +1,5 @@
 """
-Update the Google Doc to add the System Design section.
+Update the Google Doc to add the Authority Article section.
 """
 import json
 from google.oauth2.credentials import Credentials
@@ -24,11 +24,11 @@ blocks = [
     ("\n", {}),
     ("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n", {}),
     ("\n", {}),
-    ("System Design & Architecture\n", {"bold": True}),
+    ("Thought Leadership\n", {"bold": True}),
     ("\n", {}),
-    ("System Design Doc: ", {"bold": True}),
-    ("https://drive.google.com/file/d/15HXfZNtgIuXFkGsbI04PtLIUebvMYMK-/view?usp=drivesdk\n",
-     {"link": {"url": "https://drive.google.com/file/d/15HXfZNtgIuXFkGsbI04PtLIUebvMYMK-/view?usp=drivesdk"}}),
+    ("Authority Article: ", {"bold": True}),
+    ("https://drive.google.com/file/d/1YYdmRtPX1nqVxRyjHXZhJ8CFnhV3V6on/view?usp=drivesdk\n",
+     {"link": {"url": "https://drive.google.com/file/d/1YYdmRtPX1nqVxRyjHXZhJ8CFnhV3V6on/view?usp=drivesdk"}}),
     ("\n", {}),
 ]
 

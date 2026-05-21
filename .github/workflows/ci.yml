@@ -1,0 +1,52 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install ruff mypy
+
+      - name: Lint
+        run: ruff check src/ tests/
+
+      - name: Type check
+        run: mypy src/ --ignore-missing-imports
+
+      - name: Test
+        run: pytest tests/ -v --tb=short
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTOR_API_KEY }}
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t agentic-rag:latest .
+
+      - name: Test Docker image
+        run: |
+          docker run -d --name test-api -p 8000:8000 --env-file .env agentic-rag:latest
+          sleep 5
+          curl -f http://localhost:8000/health || exit 1
+          docker stop test-api
