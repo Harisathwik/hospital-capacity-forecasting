@@ -15,6 +15,10 @@ data:
   test_size_days: 30
   validation_size_days: 14
 
+forecast:
+  horizon_days: 7
+  strategy: direct_multi_output
+
 features:
   target: staffed_adult_icu_bed_occupancy
   date_column: date

@@ -95,7 +95,52 @@ Splitting strategy:
 ---
 
 ## Feature Engineering Plan (TODO  next)
-TBD after we confirm: horizon definition (direct vs recursive forecasting), state-level modeling approach, lag/rolling features, and holiday features.
+LOCKED decisions:
+- Forecasting strategy: **Direct multi-output** (predict t+1..t+7 in one shot; avoids recursive error compounding)
+- Target: `staffed_adult_icu_bed_occupancy`
+- Grain: `(state, date)`
+
+### Target / horizon construction
+- For each `(state, date=t)` row, create labels:
+  - `y_t_plus_1` ... `y_t_plus_7` from future values of `staffed_adult_icu_bed_occupancy`
+- Drop the last 7 days per state (no future labels).
+
+### Feature set (past-only; no leakage)
+
+Indexing:
+- Sort by date per state.
+- Detect duplicates on `(state, date)`; warn or fail depending on severity.
+
+Lag features (examples):
+- ICU occupancy: `occ_lag_1`, `occ_lag_7`, `occ_lag_14`
+- Utilization: `adult_icu_bed_utilization_lag_1`, `_lag_7`
+- Inpatient beds used: `inpatient_beds_used_lag_1`, `_lag_7`
+- Admissions: lagged versions of prior-day admissions columns (COVID confirmed/suspected, influenza)
+
+Rolling window features (computed using only past data):
+- Rolling mean/std for windows 7/14/30 days for:
+  - ICU occupancy
+  - ICU utilization
+  - inpatient beds used
+  - admissions (confirmed/suspected; influenza where available)
+- Trend proxy: `rolling_mean_7 - rolling_mean_14` (acceleration signal)
+
+Calendar features (safe):
+- day_of_week (06), month (112), weekend flag
+- (Optional later) US federal holiday flags
+
+Operational stress signals:
+- Use staffing shortage indicators as numeric signals:
+  - `critical_staffing_shortage_today_yes/no`
+  - `critical_staffing_shortage_anticipated_within_week_yes/no`
+
+### Missingness handling
+Because ICU and influenza fields have non-trivial missingness, we will handle missingness explicitly:
+- Add missingness indicators: `is_missing_<feature>`
+- Impute numeric features with per-state median (fit on training only)
+
+### Trainingserving parity (non-negotiable)
+All preprocessing (imputation + missing indicators + optional scaling) must live inside a single serialized pipeline object (e.g., sklearn Pipeline) so training and inference compute identical features.
 
 ## Training & Evaluation Plan (TODO)
 TBD: baseline model, candidate models, temporal CV strategy, experiment tracking in MLflow.
