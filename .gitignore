@@ -29,11 +29,13 @@ Thumbs.db
 .env
 .env.local
 
-# Data
-data/*.csv
-data/*.parquet
-data/*.xlsx
-!data/sample_docs/
+# Data (large files)
+data/raw/*.csv
+data/processed/*.csv
+data/external/*.csv
+data/raw/*.parquet
+data/processed/*.parquet
+data/external/*.parquet
 
 # MLflow / ZenML
 mlruns/

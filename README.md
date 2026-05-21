@@ -1,98 +1,73 @@
-# Multi-Agent RAG System with Governance
+# Hospital Bed Demand Forecasting
 
-> A production-grade multi-agent RAG system — specialized agents for retrieval, reasoning, validation, and governance working together through LangGraph orchestration.
+> Predict ICU bed demand for the next 7 days so hospital administrators can proactively adjust staffing, cancel elective surgeries, or open overflow units.
 
-## Architecture
+## Problem Overview
+
+**Business Problem:** Hospitals need to know how many ICU beds they'll need in the next 7 days. Too few beds = patient safety risk. Too many = wasted resources.
+
+**ML Formulation:** Time-series regression — predict daily ICU bed count using historical admissions, disease surveillance, weather, and calendar features.
+
+**Primary Metric:** RMSE (penalizes large errors more — a 20-bed miss is worse than four 5-bed misses)
+
+**Guardrail Metrics:** MAE, MAPE, Prediction Interval Coverage
+
+## Project Structure
 
 ```
-User Query
-    │
-    ▼
-┌─────────────┐
-│Router Agent │ ──→ Classifies query type (factual / analytical / creative)
-└──────┬──────┘
-       │
-       ▼
-┌─────────────────────────────────┐
-│      Specialist Agent Pool       │
-│  ┌──────────┐  ┌──────────────┐ │
-│  │Retrieval │  │  Reasoning   │ │
-│  │  Agent   │  │   Agent      │ │
-│  └──────────┘  └──────────────┘ │
-│  ┌──────────┐  ┌──────────────┐ │
-│  │Citation  │  │  Validation  │ │
-│  │  Agent   │  │   Agent      │ │
-│  └──────────┘  └──────────────┘ │
-└─────────────────────────────────┘
-       │
-       ▼
-┌─────────────┐
-│ Aggregator  │ ──→ Combines agent outputs, resolves conflicts
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│ Guardrail   │ ──→ Factuality + safety + compliance check
-└──────┬──────┘
-       │
-       ▼
-Final Response + Citations
+hospital-bed-forecasting/
+├── src/
+│   ├── core/              # Pure Python logic (no framework imports)
+│   │   ├── preprocessing.py
+│   │   ├── validation.py
+│   │   └── evaluation.py
+│   ├── data/              # Data loading + validation steps
+│   ├── features/          # Feature engineering steps
+│   ├── models/            # Model training + evaluation steps
+│   ├── evaluation/        # Evaluation metrics
+│   ├── serving/           # FastAPI inference endpoint
+│   ├── monitoring/        # Drift detection
+│   └── pipelines/         # ZenML pipeline definitions
+├── tests/
+├── configs/
+│   ├── config.yaml
+│     └── config.prod.yaml
+├── data/
+│   ├── raw/               # Raw ingested data
+│   ├── processed/         # Cleaned + feature-engineered
+│   └── external/          # Weather, disease surveillance
+├── notebooks/             # EDA notebooks
+├── docs/
+│   ├── problem_statement.md
+│   ├── architecture.md
+│   └── algorithm_writeup.md
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── pyproject.toml
+└── README.md
 ```
+
+## Data Sources
+
+| Source | Data | Update Frequency |
+|--------|------|-----------------|
+| Hospital Records | Admissions, discharges, ICU transfers | Daily |
+| CDC ILINet | Influenza-like illness rates | Weekly |
+| Weather API | Temperature, humidity, precipitation | Daily |
+| Calendar | Day of week, holidays, flu season flag | Static |
 
 ## Tech Stack
 
 | Component | Tool |
 |-----------|------|
-| Orchestration | LangGraph |
-| Vector DB | ChromaDB |
-| LLM | OpenRouter |
-| Reranking | Cross-encoder |
+| Orchestration | ZenML |
+| Experiment Tracking | MLflow |
+| Model Registry | MLflow |
+| Drift Detection | Evidently |
 | Serving | FastAPI |
-| Frontend | Streamlit |
-| Testing | pytest |
-
-## Quick Start
-
-```bash
-git clone https://github.com/Harisathwik/AgenticRAG.git
-cd AgenticRAG
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-
-# Set OpenRouter API key
-cp .env.example .env
-# Edit .env with your key
-
-# Ingest documents
-python -m src.retrieval.ingest --dir data/sample_docs
-
-# Run API
-uvicorn src.serving.app:app --reload --port 8000
-
-# Open dashboard
-streamlit run src/dashboard/app.py
-```
-
-## Project Structure
-
-```
-AgenticRAG/
-├── src/
-│   ├── agents/           # 7 specialized agents
-│   ├── orchestrator/     # LangGraph state machine
-│   ├── retrieval/        # Embedding, vector store, reranking
-│   ├── serving/          # FastAPI application
-│   ├── evaluation/       # Faithfulness, recall, latency metrics
-│   └── dashboard/        # Streamlit monitoring UI
-├── tests/
-├── configs/
-├── data/sample_docs/
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-└── README.md
-```
+| Monitoring | Streamlit Dashboard |
+| CI/CD | GitHub Actions |
 
 ## License
 
@@ -100,7 +75,7 @@ MIT
 
 ## Author
 
-**Harisathwik Veerla** — AI Engineer specializing in agentic systems, RAG architectures, and LLMOps.
+**Harisathwik Veerla** — AI Engineer specializing in production ML systems, MLOps, and agentic AI.
 
 - LinkedIn: https://www.linkedin.com/in/harisathwik-veerla/
 - GitHub: https://github.com/Harisathwik

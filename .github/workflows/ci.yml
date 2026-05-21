@@ -31,22 +31,13 @@ jobs:
 
       - name: Test
         run: pytest tests/ -v --tb=short
-        env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTOR_API_KEY }}
 
   build:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t agentic-rag:latest .
-
-      - name: Test Docker image
-        run: |
-          docker run -d --name test-api -p 8000:8000 --env-file .env agentic-rag:latest
-          sleep 5
-          curl -f http://localhost:8000/health || exit 1
-          docker stop test-api
+        run: docker build -t hospital-bed-forecasting:latest .
