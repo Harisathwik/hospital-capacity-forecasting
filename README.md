@@ -54,8 +54,8 @@ Final Response + Citations
 ## Quick Start
 
 ```bash
-git clone https://github.com/Harisathwik/MLOps-Github.git
-cd MLOps-Github
+git clone https://github.com/Harisathwik/AgenticRAG.git
+cd AgenticRAG
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
@@ -77,7 +77,7 @@ streamlit run src/dashboard/app.py
 ## Project Structure
 
 ```
-MLOps-Github/
+AgenticRAG/
 ├── src/
 │   ├── agents/           # 7 specialized agents
 │   ├── orchestrator/     # LangGraph state machine
