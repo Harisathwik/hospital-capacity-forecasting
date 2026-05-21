@@ -283,8 +283,30 @@ zenml stack register local_mlops_stack \
 See repo structure under `src/`, `configs/`, `docs/`, `tests/`.
 
 ## MVP Scope
-MVP = reproducible training pipeline + batch inference + drift report + rollbackable model registry.
+MVP = reproducible training pipeline + batch inference + drift/health report artifacts + rollbackable model registry.
+
+### MVP checklist (what Done means)
+Training & evaluation
+- [ ] Deterministic data pull + pull manifest stored
+- [ ] Data validation gates run before training
+- [ ] Feature builder creates leakage-safe lags/rollings + 7 horizon labels
+- [ ] Baselines computed: naive persistence, Ridge, XGBoost
+- [ ] Metrics logged per-horizon and aggregated (asymmetric RMSE under d73, MAE, underprediction rate)
+- [ ] Best run registered to **Staging** with full metadata (code/data/config)
+- [ ] Manual promotion Staging > Production after gates pass
+
+Batch inference
+- [ ] Daily batch inference produces `data/outputs/icu_occupancy_forecast.parquet`
+- [ ] Output contract fields present (state, forecast_date, target_date, horizon, y_pred, model_version)
+- [ ] Rollback test: switch back to previous Production model in <5 minutes
+
+Monitoring (report-only)
+- [ ] Data health report written to `data/reports/` each run
+- [ ] Drift report (PSI etc.) written to `data/reports/` each run
+- [ ] Historical log of drift/health metrics maintained for plotting
 
 ## Deferred Components
 - External data sources (weather/ILI) until baseline pipeline is stable
+- Alerts/paging (Slack/email)  keep report-only for MVP
 - Auto retraining until drift evidence justifies it
+- Real-time API serving (batch is sufficient for staffing)
