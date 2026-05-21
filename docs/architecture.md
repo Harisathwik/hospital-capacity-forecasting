@@ -143,7 +143,32 @@ Because ICU and influenza fields have non-trivial missingness, we will handle mi
 All preprocessing (imputation + missing indicators + optional scaling) must live inside a single serialized pipeline object (e.g., sklearn Pipeline) so training and inference compute identical features.
 
 ## Training & Evaluation Plan (TODO)
-TBD: baseline model, candidate models, temporal CV strategy, experiment tracking in MLflow.
+LOCKED approach: **two baselines**
+- **Ridge regression** = "floor" model (fast, interpretable, sanity-check)
+- **XGBoost regressor** = "strong baseline" (nonlinear; typically stronger on tabular)
+
+### Split strategy (no leakage)
+- Temporal splits only (no random split).
+- Per-state ordering by date.
+- Holdout is the most recent window (e.g., last `data.test_size_days` days) to approximate future performance.
+
+### Baselines
+- **Naive persistence baseline**: use yesterday's ICU occupancy as the forecast for all horizons (t+1..t+7).
+- Compare Ridge and XGBoost against this baseline using the same temporal split.
+
+### Metrics
+- **Primary metric**: asymmetric RMSE (underprediction  penalty) aggregated across horizons, plus per-horizon breakdown.
+- **Guardrails**: MAE and underprediction rate (% of days where prediction < actual).
+
+### Experiment tracking & reproducibility
+- Use MLflow (via ZenML stack) to log:
+  - parameters (model hyperparams, horizon, feature windows)
+  - data pull manifest (query + date range + row count)
+  - metrics per horizon + aggregated
+  - model artifacts (full preprocessing+model pipeline)
+
+### Temporal validation (optional after MVP)
+- Rolling-origin evaluation (walk-forward) for more robust estimates.
 
 ## Deployment Plan (TODO)
 TBD: batch inference schedule, output format, model promotion workflow.
