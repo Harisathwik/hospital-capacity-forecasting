@@ -252,7 +252,32 @@ LOCKED: **Two-stage promotion flow** (Staging > Production)
 - Rollback target time: <5 minutes.
 
 ## ZenML Stack Specification (TODO)
-TBD in Phase 2H after requirements are set.
+LOCKED: **Local-only ZenML stack (MVP)**
+
+| Component | Choice | Why |
+|---|---|---|
+| Orchestrator | `default` (local) | simplest execution on your machine |
+| Artifact Store | Local artifact store | stores pipeline artifacts locally |
+| Experiment Tracker | MLflow (local) | experiment history + metrics per run |
+| Model Registry | MLflow model registry | supports Staging > Production promotion |
+| Data Validator | Evidently | drift/health report artifacts |
+
+Reference CLI commands (used in Phase 3 implementation):
+
+```bash
+zenml artifact-store register my_artifact_store --flavor=local
+zenml experiment-tracker register mlflow_experiment_tracker --flavor=mlflow
+zenml model-registry register mlflow_model_registry --flavor=mlflow
+zenml data-validator register evidently_data_validator --flavor=evidently
+
+zenml stack register local_mlops_stack \
+  -o default \
+  -a my_artifact_store \
+  -e mlflow_experiment_tracker \
+  -r mlflow_model_registry \
+  -dv evidently_data_validator \
+  --set
+```
 
 ## Project Structure
 See repo structure under `src/`, `configs/`, `docs/`, `tests/`.

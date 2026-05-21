@@ -112,3 +112,11 @@ governance:
   thresholds:
     # Set during implementation once we have baseline numbers
     max_underprediction_rate: null
+
+zenml_stack:
+  name: local_mlops_stack
+  orchestrator: default
+  artifact_store: my_artifact_store
+  experiment_tracker: mlflow_experiment_tracker
+  model_registry: mlflow_model_registry
+  data_validator: evidently_data_validator
