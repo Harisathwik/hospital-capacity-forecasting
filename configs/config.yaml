@@ -9,28 +9,33 @@ data:
   raw_dir: data/raw
   processed_dir: data/processed
   external_dir: data/external
+  dataset_id: g62h-syeh
+  source_url: "https://healthdata.gov/Hospital/COVID-19-Reported-Patient-Impact-and-Hospital-Cap/g62h-syeh"
+  api_csv_base: "https://healthdata.gov/resource/g62h-syeh.csv"
   test_size_days: 30
   validation_size_days: 14
 
 features:
-  target: icu_bed_count
+  target: staffed_adult_icu_bed_occupancy
   date_column: date
+  group_key: state
   categorical:
-    - day_of_week
-    - is_holiday
-    - is_flu_season
-    - month
+    - state
   numeric:
-    - temperature
-    - humidity
-    - ili_rate
-    - admissions_7d_avg
-    - discharges_7d_avg
-    - icu_bed_count_lag_1
-    - icu_bed_count_lag_7
-    - icu_bed_count_lag_14
-    - icu_bed_count_rolling_7d
-    - icu_bed_count_rolling_14d
+    - inpatient_beds
+    - inpatient_beds_used
+    - inpatient_beds_used_covid
+    - inpatient_beds_utilization
+    - total_staffed_adult_icu_beds
+    - adult_icu_bed_utilization
+    - previous_day_admission_adult_covid_confirmed
+    - previous_day_admission_adult_covid_suspected
+    - previous_day_admission_influenza_confirmed
+    - total_patients_hospitalized_confirmed_influenza
+    - critical_staffing_shortage_today_yes
+    - critical_staffing_shortage_today_no
+    - critical_staffing_shortage_anticipated_within_week_yes
+    - critical_staffing_shortage_anticipated_within_week_no
   lag_features:
     - 1
     - 7
@@ -53,15 +58,14 @@ model:
     early_stopping_rounds: 50
 
 evaluation:
-  primary_metric: rmse
+  primary_metric: asymmetric_rmse_under3x
+  underprediction_penalty: 3.0
   guardrail_metrics:
     - mae
-    - mape
+    - underprediction_rate
   prediction_interval: 0.95
   slice_by:
-    - day_of_week
-    - is_flu_season
-    - month
+    - state
 
 serving:
   host: 0.0.0.0
