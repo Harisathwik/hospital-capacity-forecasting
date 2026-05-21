@@ -200,7 +200,32 @@ Write `data/outputs/icu_occupancy_forecast.parquet` (or CSV) with columns:
 - Rollback: batch job can be pointed back to the previous Production model version; rollback must be <5 minutes.
 
 ## Monitoring & Drift Plan (TODO)
-TBD: what to monitor (data drift, prediction drift, underprediction rate), alert routes, retraining trigger.
+LOCKED (MVP): **Report-only monitoring** (no alerts/paging).
+
+Why: avoids noisy alerting complexity while still preventing silent failures. Monitoring outputs become versioned artifacts you can review and show in a portfolio.
+
+### What we monitor
+Data health (run every batch):
+- schema checks (required columns, types)
+- missingness rates (watch for spikes vs baseline)
+- duplicates on (state, date)
+- freshness (latest date observed)
+
+Drift (run daily/with each batch):
+- feature distribution drift vs training baseline (e.g., PSI on key numeric features)
+- target drift is only measurable once labels arrive; for MVP we track *prediction distribution* + later backtest error.
+
+Prediction risk guardrails:
+- underprediction rate (% days y_pred < y_true) on backtests
+- asymmetric RMSE trend over time (when labels are available)
+
+### Outputs (artifacts)
+- Write drift + health reports to `data/reports/` (HTML/JSON/Parquet summaries).
+- Keep a simple historical log so we can plot drift/health over time.
+
+### Retraining trigger (deferred)
+- MVP does not auto-retrain. We generate reports; retraining is a manual decision.
+- We add auto-retraining only after we see consistent drift or sustained metric degradation.
 
 ## Versioning & Governance (TODO)
 TBD: registry stages (staging/production), promotion gates, rollback strategy.

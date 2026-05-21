@@ -88,6 +88,8 @@ deployment:
   output_path: data/outputs/icu_occupancy_forecast.parquet
 
 monitoring:
+  mode: report_only
+  report_dir: data/reports
   drift_threshold: 0.05
   psi_threshold: 0.2
   alert_email: ""
