@@ -82,6 +82,11 @@ serving:
   port: 8000
   model_stage: Production
 
+deployment:
+  mode: batch
+  schedule_local_time: "06:00"
+  output_path: data/outputs/icu_occupancy_forecast.parquet
+
 monitoring:
   drift_threshold: 0.05
   psi_threshold: 0.2

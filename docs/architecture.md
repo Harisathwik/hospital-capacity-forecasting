@@ -157,7 +157,7 @@ LOCKED approach: **two baselines**
 - Compare Ridge and XGBoost against this baseline using the same temporal split.
 
 ### Metrics
-- **Primary metric**: asymmetric RMSE (underprediction  penalty) aggregated across horizons, plus per-horizon breakdown.
+- **Primary metric**: asymmetric RMSE (underprediction ×3 penalty) aggregated across horizons, plus per-horizon breakdown.
 - **Guardrails**: MAE and underprediction rate (% of days where prediction < actual).
 
 ### Experiment tracking & reproducibility
@@ -171,7 +171,33 @@ LOCKED approach: **two baselines**
 - Rolling-origin evaluation (walk-forward) for more robust estimates.
 
 ## Deployment Plan (TODO)
-TBD: batch inference schedule, output format, model promotion workflow.
+LOCKED: **Batch inference** (daily)  no real-time API in MVP.
+
+### How predictions are consumed
+- Predictions are generated once per day and written to a durable artifact (CSV/Parquet).
+- Downstream users (staffing ops) consume a simple table with forecast + uncertainty.
+
+### Schedule
+- Batch job runs daily (e.g., 06:00 local) to forecast horizons t+1..t+7.
+
+### Input contract
+- Uses the latest available raw snapshot (or incrementally pulled data) up to date=t.
+- Applies the same feature pipeline as training (trainingserving parity).
+
+### Output contract (recommended)
+Write `data/outputs/icu_occupancy_forecast.parquet` (or CSV) with columns:
+- state
+- forecast_date (the date we ran the batch)
+- target_date (the day being forecasted)
+- horizon (1..7)
+- y_pred (point forecast)
+- y_pred_p50/p90 (optional later)
+- model_version (from registry)
+
+### Model promotion + rollback
+- Models are registered with metrics attached.
+- Promotion rule (MVP): promote the best run that beats naive baseline on the primary metric and passes underprediction-rate guardrail.
+- Rollback: batch job can be pointed back to the previous Production model version; rollback must be <5 minutes.
 
 ## Monitoring & Drift Plan (TODO)
 TBD: what to monitor (data drift, prediction drift, underprediction rate), alert routes, retraining trigger.
