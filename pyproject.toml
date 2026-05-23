@@ -26,6 +26,7 @@ dependencies = [
     "uvicorn==0.47.0",
     "streamlit==1.57.0",
     "matplotlib==3.10.9",
+    "scipy==1.17.1",
 
     # Test/dev (install later if/when we start writing tests + CI enforcement)
     "pytest==9.0.3",
@@ -40,6 +41,13 @@ dependencies = [
     "opentelemetry-api==1.42.1",
     "opentelemetry-sdk==1.41.1",
     "opentelemetry-semantic-conventions==0.62b1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.3",
+    "ruff==0.14.1",
+    "mypy==1.18.2",
 ]
 
 [tool.ruff]

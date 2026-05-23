@@ -1,5 +1,7 @@
 # Hospital Bed Demand Forecasting
 
+[![CI](https://github.com/Harisathwik/hospital-bed-forecasting/actions/workflows/ci.yml/badge.svg)](https://github.com/Harisathwik/hospital-bed-forecasting/actions/workflows/ci.yml)
+
 > Predict ICU bed demand for the next 7 days so hospital administrators can proactively adjust staffing, cancel elective surgeries, or open overflow units.
 
 ## Problem Overview
@@ -8,9 +10,8 @@
 
 **ML Formulation:** Time-series regression — predict daily ICU bed count using historical admissions, disease surveillance, weather, and calendar features.
 
-**Primary Metric:** RMSE (penalizes large errors more — a 20-bed miss is worse than four 5-bed misses)
-
-**Guardrail Metrics:** MAE, MAPE, Prediction Interval Coverage
+**Primary Metric:** Asymmetric RMSE (underprediction ×3 penalty) — because understaffing is far worse than overstaffing.
+**Guardrail Metrics:** MAE, Underprediction Rate, Prediction Interval Coverage.
 
 ## Project Structure
 
@@ -57,17 +58,13 @@ hospital-bed-forecasting/
 | Weather API | Temperature, humidity, precipitation | Daily |
 | Calendar | Day of week, holidays, flu season flag | Static |
 
-## Tech Stack
+## Production Features
 
-| Component | Tool |
-|-----------|------|
-| Orchestration | ZenML |
-| Experiment Tracking | MLflow |
-| Model Registry | MLflow |
-| Drift Detection | Evidently |
-| Serving | FastAPI |
-| Monitoring | Streamlit Dashboard |
-| CI/CD | GitHub Actions |
+- **Automated Pipelines:** ZenML orchestration for training and inference.
+- **Model Control Plane:** MLflow for experiment tracking, model versioning, and staging $\to$ production promotion.
+- **Monitoring & Drift:** Integrated PSI and KS-test based drift detection with data health checks (schema, missingness, freshness) and JSON reporting.
+- **Serving:** High-performance FastAPI endpoint for real-time predictions.
+- **Safe Deployment:** Rollback capability to previous model versions in < 5 minutes.
 
 ## License
 

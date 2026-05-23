@@ -3,17 +3,23 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-*.egg-info/
-dist/
-build/
-eggs/
-*.egg
-
-# Virtual environment
 .venv/
 venv/
 env/
-ENV/
+
+# Data
+data/raw/
+data/processed/
+data/reports/
+data/external/
+*.csv
+*.parquet
+*.db
+
+# MLflow / ZenML
+mlruns/
+mlflow.db
+.zen/
 
 # IDE
 .vscode/
@@ -25,25 +31,6 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Environment
+# Env
 .env
 .env.local
-
-# Data (large files)
-data/raw/*.csv
-data/processed/*.csv
-data/external/*.csv
-data/raw/*.parquet
-data/processed/*.parquet
-data/external/*.parquet
-
-# MLflow / ZenML
-mlruns/
-.zen/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Build
-_site/
-*.pyc

@@ -1,10 +1,11 @@
 """Feature engineering: lags, rolling stats, calendar features, and target construction."""
 
-
 from typing import Optional
 
 import pandas as pd
 import numpy as np
+
+from src.core.config import load_config
 
 
 COL_OCCUPANCY = "staffed_adult_icu_bed_occupancy"
@@ -80,38 +81,64 @@ def build_features(
         df: feature DataFrame (with targets)
         state_medians: per-state medians for imputation (fit on training data only)
     """
+    config = load_config()
     df = df.sort_values(["state", "date"]).copy()
 
-    # Missingness indicators (before imputation)
-    _add_missingness_indicators(df, LAG_COLS)
+    # --- Missingness indicators for all numeric columns ---
+    numeric_cols = config["features"]["numeric"]
+    _add_missingness_indicators(df, numeric_cols)
 
-    # Compute per-state medians for imputation
+    # --- Imputation: fill NaNs with state median, then global median ---
     if state_medians is None:
-        state_medians = df.groupby("state")[LAG_COLS].median().to_dict("index")
+        # Compute median per state for all numeric columns
+        state_medians = df.groupby("state")[numeric_cols].median().to_dict("index")
+        # Also compute global median as fallback
+        global_median = df[numeric_cols].median().to_dict()
 
-    for col in LAG_COLS:
+    for col in numeric_cols:
         if col in df.columns:
+            # Fill with state median
             df[col] = df.groupby("state")[col].transform(
-                lambda x: x.fillna(x.median())
+                lambda x: x.fillna(x.median() if not x.isna().all() else 0)
             )
+            # If any NaN remain (e.g., all values NaN for a state), fill with global median
+            df[col] = df[col].fillna(global_median[col])
 
-    # Lags
+    # --- Lags (only for the original LAG_COLS, as before) ---
     for col in LAG_COLS:
         _add_lags(df, col)
 
-    # Rolling stats on occupancy + utilization
+    # --- Rolling stats on occupancy + utilization ---
     _add_rolling(df, COL_OCCUPANCY)
     _add_rolling(df, COL_UTILIZATION)
 
-    # Calendar features
+    # --- Calendar features ---
     _add_calendar(df)
 
-    # Staffing shortage features (already numeric counts)
+    # --- Staffing shortage features (already numeric counts) ---
     for col in [COL_STAFF_SHORT_YES, COL_STAFF_SHORT_NO, COL_STAFF_SHORT_ANTICIPATED]:
         if col in df.columns:
             df[col] = df[col].fillna(0)
 
-    # Targets (direct multi-output)
+    # --- Fill NaNs in lag and rolling features with 0 ---
+    # Identify lag and rolling columns we just created
+    lag_rolling_cols = []
+    for col in LAG_COLS:
+        for lag in [1, 7, 14]:
+            lag_rolling_cols.append(f"{col}_lag_{lag}")
+    for col in [COL_OCCUPANCY, COL_UTILIZATION]:
+        for w in ROLLING_WINDOWS:
+            lag_rolling_cols.append(f"{col}_rolling_mean_{w}")
+            lag_rolling_cols.append(f"{col}_rolling_std_{w}")
+        if 7 in ROLLING_WINDOWS and 14 in ROLLING_WINDOWS:
+            lag_rolling_cols.append(f"{col}_trend_7_14")
+
+    # Fill NaNs in these columns with 0
+    for col in lag_rolling_cols:
+        if col in df.columns:
+            df[col] = df[col].fillna(0)
+
+    # --- Targets (direct multi-output) ---
     _add_targets(df, horizon=horizon)
 
     # Drop rows where any target is NaN (last `horizon` days per state)

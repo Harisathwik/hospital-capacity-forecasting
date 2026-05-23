@@ -40,6 +40,7 @@ features:
     - critical_staffing_shortage_today_no
     - critical_staffing_shortage_anticipated_within_week_yes
     - critical_staffing_shortage_anticipated_within_week_no
+    - staffed_adult_icu_bed_occupancy
   lag_features:
     - 1
     - 7
