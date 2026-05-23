@@ -1,6 +1,6 @@
 # Hospital Bed Demand Forecasting
 
-[![CI](https://github.com/Harisathwik/hospital-bed-forecasting/actions/workflows/ci.yml/badge.svg)](https://github.com/Harisathwik/hospital-bed-forecasting/actions/workflows/ci.yml)
+[![CI](https://github.com/Harisathwik/AgenticRAG/actions/workflows/ci.yml/badge.svg)](https://github.com/Harisathwik/AgenticRAG/actions/workflows/ci.yml)
 
 > Predict ICU bed demand for the next 7 days so hospital administrators can proactively adjust staffing, cancel elective surgeries, or open overflow units.
 

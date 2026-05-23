@@ -7,19 +7,19 @@ __pycache__/
 venv/
 env/
 
-# Data
-data/raw/
-data/processed/
-data/reports/
-data/external/
+# Data & artifacts
+data/
 *.csv
 *.parquet
 *.db
+*.pkl
+*.joblib
 
 # MLflow / ZenML
 mlruns/
 mlflow.db
 .zen/
+.pytest_cache/
 
 # IDE
 .vscode/
@@ -34,3 +34,6 @@ Thumbs.db
 # Env
 .env
 .env.local
+
+# Debug scripts
+debug_*.py

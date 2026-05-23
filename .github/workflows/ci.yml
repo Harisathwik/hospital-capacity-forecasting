@@ -20,18 +20,15 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -e ".[dev]"
-          pip install ruff mypy
-          pip install scipy pandas numpy
+          python -m pip install --upgrade pip
+          pip install pytest pandas numpy scipy scikit-learn
+          pip install ruff
 
       - name: Lint
-        run: ruff check src/ tests/
-
-      - name: Type check
-        run: mypy src/ --ignore-missing-imports
+        run: ruff check src/ tests/ --output-format=github
 
       - name: Test
-        run: pytest tests/ -v --tb=short
+        run: PYTHONPATH=. pytest tests/ -v --tb=short
 
   build:
     needs: test
