@@ -2,7 +2,7 @@
 name = "hospital-bed-forecasting"
 version = "0.1.0"
 description = "Hospital Bed Demand Forecasting — Predict ICU bed demand for proactive staffing"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 dependencies = [
     # Pinned to known-working local environment (Windows) to keep ZenML stable/reproducible.
     # If you want looser constraints later, we can relax these once CI is green.
