@@ -323,15 +323,78 @@ hospital-capacity-forecasting/
 
 ---
 
-## Key Design Decisions Summary
+## Architecture Diagram
 
-| Decision | Rationale |
-|----------|-----------|
-| Asymmetric loss (×3 underprediction) | Understaffing is far worse than overstaffing |
-| Direct multi-output forecasting | Avoids recursive error compounding |
-| Temporal splits only | Random splits leak future info; temporal reflects reality |
-| PSI + KS drift detection | Catches both gradual and abrupt distribution shifts |
-| Report-only monitoring (MVP) | Avoids alert fatigue; manual retrain decision |
-| Training-serving parity (sklearn.Pipeline) | Prevents #1 production ML bug |
-| Rollback < 5 minutes | Production safety requirement |
-| Two-stage promotion (Staging → Production) | Prevents broken models from reaching production |
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    HOSPITAL CAPACITY FORECASTING — ARCHITECTURE              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
+│   DATA SOURCE    │    │  PULL MANIFEST   │    │  RAW STORAGE     │
+│ HHS healthdata   │──▶│  Deterministic   │──▶│  data/raw/       │
+│ .gov (Socrata)   │    │  query + version │    │  (CSV/Parquet)   │
+└──────────────────┘    └──────────────────┘    └────────┬─────────┘
+                                                         │
+                                                         ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          TRAINING PIPELINE (ZenML)                          │
+│                                                                             │
+│  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐   ┌─────────────┐  │
+│  │    DATA      │   │   FEATURE    │   │    MODEL     │   │  EVALUATION  │  │
+│  │  VALIDATION  │──▶│ ENGINEERING  │──▶│  TRAINING    │──▶│              │  │
+│  │              │   │              │   │              │   │ Asymmetric   │  │
+│  │ • Schema     │   │ • Lags (1,7) │   │ • Ridge      │   │ RMSE (×3)   │  │
+│  │ • Missingness│   │ • Rolling    │   │ • XGBoost    │   │ • MAE        │  │
+│  │ • Range      │   │ • Calendar   │   │ • Naive      │   │ • Underpred  │  │
+│  │ • Freshness  │   │ • Ops Signals│   │   (baseline) │   │   Rate       │  │
+│  └──────────────┘   └──────────────┘   └──────────────┘   └──────┬──────┘  │
+└─────────────────────────────────────────────────────────────────────┼────────┘
+                                                                      │
+                                                                      ▼
+┌──────────────────┐    ┌──────────────────┐
+│  MLflow REGISTRY │    │    ROLLBACK      │
+│  Staging → Prod  │──▶ │    < 5 min       │
+└────────┬─────────┘    └──────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              SERVING LAYER                                  │
+│                                                                             │
+│  ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐       │
+│  │   FastAPI        │    │  BATCH INFERENCE │    │  FORECAST OUTPUT │       │
+│  │   :8002          │    │  Daily @ 06:00   │──▶ │  .parquet        │       │
+│  │   /predict       │    │                  │    │  state/date/     │       │
+│  │   /health        │    │                  │    │  horizon/y_pred  │       │
+│  └──────────────────┘    └──────────────────┘    └──────────────────┘       │
+└─────────────────────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           MONITORING LAYER                                  │
+│                                                                             │
+│  ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐       │
+│  │  DRIFT DETECTION │    │  DATA HEALTH     │    │  STREAMLIT       │       │
+│  │                  │    │                  │    │  DASHBOARD       │       │
+│  │ • PSI (per-feat) │──▶│ • Schema         │──▶│ • Drift Plots   │       │
+│  │ • KS Test        │    │ • Missingness    │    │ • Health Metrics │       │
+│  │ • Thresholds     │    │ • Duplicates     │    │ • Alert Log      │       │
+│  │   0.1 / 0.2      │    │ • Freshness SLA  │    │                  │       │
+│  └──────────────────┘    └──────────────────┘    └──────────────────┘       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           KEY DESIGN DECISIONS                               │
+│                                                                             │
+│  ◆ Asymmetric Loss (×3 underprediction) — staffing safety over cost          │
+│  ◆ Direct multi-output — no recursive error compounding                     │
+│  ◆ Temporal splits only — random splits leak future info                    │
+│  ◆ Training-serving parity — sklearn.Pipeline prevents #1 production bug    │
+│  ◆ Report-only monitoring — avoids alert fatigue, manual retrain decision   │
+│  ◆ Rollback < 5 min — safety requirement                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+GitHub: https://github.com/Harisathwik/hospital-capacity-forecasting
+Dashboard: https://hospital-capacity-forecasting.streamlit.app/
+Data: https://healthdata.gov/resource/g62h-syeh.csv
+```
