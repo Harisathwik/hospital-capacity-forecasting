@@ -1,7 +1,7 @@
 # Hospital Bed Demand Forecasting — Configuration
 
 project:
-  name: hospital-bed-forecasting
+  name: icuflow
   version: 0.1.0
   random_seed: 42
 

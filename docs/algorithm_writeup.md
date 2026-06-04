@@ -157,6 +157,6 @@ Combined, they catch both gradual degradation and sudden data pipeline failures.
 
 ## Links
 
-- **GitHub:** https://github.com/Harisathwik/hospital-capacity-forecasting
-- **Live Dashboard:** https://hospital-capacity-forecasting.streamlit.app/
+- **GitHub:** https://github.com/Harisathwik/icuflow
+- **Live Dashboard:** https://icuflow.streamlit.app/
 - **Data Source:** https://healthdata.gov/Hospital/COVID-19-Reported-Patient-Impact-and-Hospital-Cap/g62h-syeh

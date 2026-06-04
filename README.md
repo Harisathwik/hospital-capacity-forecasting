@@ -1,13 +1,13 @@
 # Hospital Capacity Forecasting
 
-[![CI](https://github.com/Harisathwik/hospital-capacity-forecasting/actions/workflows/ci.yml/badge.svg)](https://github.com/Harisathwik/hospital-capacity-forecasting/actions/workflows/ci.yml)
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Dashboard-Streamlit-FF4B4B?logo=streamlit)](https://hospital-capacity-forecasting.streamlit.app/)
+[![CI](https://github.com/Harisathwik/icuflow/actions/workflows/ci.yml/badge.svg)](https://github.com/Harisathwik/icuflow/actions/workflows/ci.yml)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Dashboard-Streamlit-FF4B4B?logo=streamlit)](https://icuflow.streamlit.app/)
 
 > Predict ICU bed demand for the next 7 days so hospital administrators can proactively adjust staffing, cancel elective surgeries, or open overflow units.
 
 ## 🚀 Live Demo
 
-**Dashboard:** [hospital-capacity-forecasting.streamlit.app](https://hospital-capacity-forecasting.streamlit.app/)
+**Dashboard:** [icuflow.streamlit.app](https://icuflow.streamlit.app/)
 
 The dashboard shows real-time drift detection, data health monitoring, and feature distribution analysis — all updated from the latest pipeline run.
 
@@ -61,7 +61,7 @@ Data (HHS healthdata.gov)
 ## 📁 Project Structure
 
 ```
-hospital-capacity-forecasting/
+icuflow/
 ├── src/
 │   ├── core/              # Pure Python logic (no framework imports)
 │   │   ├── preprocessing.py
@@ -117,8 +117,8 @@ The drift detection pipeline runs automatically and writes reports to `data/repo
 ## 🔧 Local Setup
 
 ```bash
-git clone https://github.com/Harisathwik/hospital-capacity-forecasting.git
-cd hospital-capacity-forecasting
+git clone https://github.com/Harisathwik/icuflow.git
+cd icuflow
 python -m venv .venv
 source .venv/bin/activate  # or .venv\Scripts\activate on Windows
 pip install -e ".[dev]"

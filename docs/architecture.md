@@ -260,7 +260,7 @@ Use MLflow (via ZenML stack) to log:
 ## Project Structure
 
 ```
-hospital-capacity-forecasting/
+icuflow/
 ├── src/
 │   ├── core/              # Pure Python logic (no framework imports)
 │   │   ├── preprocessing.py
@@ -394,7 +394,7 @@ hospital-capacity-forecasting/
 │  ◆ Rollback < 5 min — safety requirement                                   │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-GitHub: https://github.com/Harisathwik/hospital-capacity-forecasting
-Dashboard: https://hospital-capacity-forecasting.streamlit.app/
+GitHub: https://github.com/Harisathwik/icuflow
+Dashboard: https://icuflow.streamlit.app/
 Data: https://healthdata.gov/resource/g62h-syeh.csv
 ```
