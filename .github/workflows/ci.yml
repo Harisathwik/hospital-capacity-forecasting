@@ -25,5 +25,27 @@ jobs:
       - name: Lint
         run: ruff check src/ tests/ --output-format=github
 
-      - name: Test
-        run: PYTHONPATH=. pytest tests/ -v --tb=short
+      - name: Test with coverage
+        run: |
+          PYTHONPATH=. pytest tests/ -v --tb=short \
+            --cov=src --cov-report=term-missing --cov-report=xml \
+            --cov-fail-under=40
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+  deploy-gate:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+      - name: Promotion gate check
+        run: |
+          echo "✓ All tests passed — promotion gate open"
+          echo "✓ Coverage threshold met (40%)"
+          echo "⚠ Manual review required for Production promotion"
+          echo "   Run: python -m src.governance.promotion --stage Staging"

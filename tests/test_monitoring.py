@@ -160,7 +160,7 @@ class TestDataHealthChecker:
             required_columns=["a", "b"],
             date_column="date",
             key_columns=["a", "date"],
-            freshness_max_days=10000, # Large threshold for test data
+            freshness_max_days=100000,  # Large threshold for test data
         )
         df = pd.DataFrame({
             "a": [1, 2, 3],

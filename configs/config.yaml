@@ -95,6 +95,10 @@ monitoring:
   psi_threshold: 0.2
   alert_email: ""
   check_frequency: daily
+  prediction_monitoring:
+    psi_threshold: 0.2
+    dead_prediction_fraction: 0.5
+    max_stale_minutes: 60
 
 retraining:
   trigger: drift
@@ -111,8 +115,7 @@ governance:
     require_reproducible_run: true
     require_underprediction_rate_below_threshold: true
   thresholds:
-    # Set during implementation once we have baseline numbers
-    max_underprediction_rate: null
+    max_underprediction_rate: 0.3
 
 zenml_stack:
   name: local_mlops_stack

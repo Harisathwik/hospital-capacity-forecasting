@@ -101,7 +101,7 @@ class DataHealthChecker:
         try:
             dates = pd.to_datetime(df[self.date_column])
             latest = dates.max()
-            now = pd.Timestamp.utcnow()
+            now = pd.Timestamp.utcnow().tz_localize(None)
             days_behind = (now - latest).days
 
             # FIX: In test env, if data is very old, it's likely a mock. 

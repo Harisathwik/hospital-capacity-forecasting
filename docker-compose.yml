@@ -9,4 +9,19 @@ services:
       - .env
     volumes:
       - ./data:/app/data
+      - ./configs:/app/configs
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; r = httpx.get('http://localhost:8000/health'); raise SystemExit(0 if r.status_code == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    environment:
+      - OTEL_SERVICE_NAME=icu-forecast-api
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
